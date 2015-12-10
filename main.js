@@ -58,6 +58,15 @@ window.onload = function () {
            //  console.log("You pressed the Down Arrow");
         }
 
+         function drawScore(ctx) {
+                      ctx.font = "16px Arial";
+                      ctx.fillStyle = "#0095DD";
+                      ctx.fillText("Player: "+ playerScore, 8, 20);
+                      ctx.fillText("Computer: " + computerScore, canvas.width - 300, 20);
+                  }
+
+
+
 
 
 
@@ -84,33 +93,50 @@ window.onload = function () {
             }
 
             this.updatePosition = function(){
+
+                  var tempx = newLocationX - this.radius;
+                   var tempy = newLocationY + this.radius;
+                 
                
               
                   //MOVE THE BALL TO A NEW LOCATION -> NEW_LOCATION = CURRENT_LOC + (SPEED * DIRECTION)
                      var newLocationX = this.x + (this.speed * this.directionX);
                      var newLocationY = this.y + (this.speed * this.directionY);
                   //CHECK FOR COLLISION WITH ALL FOUR WALLS
-                  if (newLocationY<= TOP_BOARD || newLocationY >= BOTTOM_BOARD) {
-                    this.directionY = (this.directionY * -1);
+                  if (newLocationY <= TOP_BOARD || newLocationY >= BOTTOM_BOARD) {
+                    this.directionY *= -1;
                   }
 
-                  else if (newLocationX <= LEFT_BOARD || newLocationX >= RIGHT_BOARD) {
-                    this.directionX = (this.directionX * -1);
+                  else if (newLocationX <= LEFT_BOARD) {
+                    computerScore += 1;
+                    this.directionX *= -1;
+                    // instead change score and start new game
+                    // elsewhere set left player to WS up/down and computer to up/dpwn arrows
                   }
 
-                  else {
+                  else if (newLocationX >= RIGHT_BOARD) {
+                    playerScore +=1;
+                    this.directionX *= -1;
+                  }
+
+                   
+
+                  else if ((newLocationX <= player.x + player.width && newLocationX>= player.x) && (newLocationY >= player.y && newLocationY <= player.y + player.height)) {
+                    this.directionX *= -1;
+                   }
+                   else if ((newLocationX <= computer.x + computer.width && newLocationX>= computer.x) && (newLocationY >= computer.y && newLocationY  <= computer.y + computer.height)) {
+                    this.directionX *= -1;
+                   }
+                   
+
+                   else {
                       this.x = newLocationX;
                       this.y = newLocationY;
-                  }
-                   // paddles have fixed x range (paddle left and right have left and right x boudnaries)
 
-                   // if (newLocationY >= player.y) {
-                   //  this.directionY = (this.directionY * -1);
-                   // }
+                   } 
+                   
 
-                   // else {
-                   //  this.y = (this.directionY * -1);
-                   // }
+
             // variable y positions (update top and bottom y each paddle move)
             // for ball, if position x is in range of a  paddle and y is in range of that paddles y
             //     then reflect
@@ -121,6 +147,18 @@ window.onload = function () {
 
               //IF COLLIDES BACKTRACK, THEN REVERSE DIRECTION
               console.log("Updating Ball");
+
+        //        Paddle.prototype.update = function() {
+        //    // if ball moves up
+        //    if (newLocationy > this.y) {
+        //      then move paddle up
+
+        //    }
+
+        //    else (newLocation < this.x) {
+        //     then move paddle down
+        //    }
+        // }
 
             
           }
@@ -139,12 +177,21 @@ window.onload = function () {
         var UP_ARROW = 38;
         var DOWN_ARROW = 40;
 
+        var P2UP_ARROW = 65;
+        var P2DOWN_ARROW = 83;
+
         var TOP_BOARD;
         var BOTTOM_BOARD;
         var RIGHT_BOARD;
         var LEFT_BOARD;
 
         var FRAME_RATE = 60;
+
+        var playerScore = 0;
+        var computerScore = 0;
+       
+
+        var gameOver = false;
 
 
         //initialize the canvas, and save the context
@@ -181,7 +228,7 @@ window.onload = function () {
 
               player = new Paddle(40,300,30,100, "blue");
               computer = new Paddle(1360, 300, 30, 100, "yellow");
-              pongBall = new Ball(600,300,15, "yellow", 5, Math.random(), Math.random()); 
+              pongBall = new Ball(600,300,15, "yellow", 10, Math.random(), Math.random()); 
               // randomDirection(),randomDirection()
 
               //function randomDirection 
@@ -231,6 +278,17 @@ window.onload = function () {
 
         }
 
+        function checkForGameOver() {
+
+          //IF PLAYER"S SCORE IS >= 10
+            //DISPLAY HUGE TEXT THAT PLAYER WINS
+            //SET GAME OVER FLAG TO TRUE
+          //ELSE IF COMPUTER SCORE IS >= 10
+            //DISPLAY HUGE TEXT THAT COMPUTER WINS
+            //SET GAME OVER FLAG TO TRUE
+
+        }
+
         function Render(){
 
               //Clear THE FRAME BUFFER
@@ -243,7 +301,10 @@ window.onload = function () {
               pongBall.updatePosition();
               pongBall.draw(context);
 
-              requestAnimationFrame(Render);
+              drawScore(context);
+
+              if(gameOver === false)
+                requestAnimationFrame(Render);
 
     
 
@@ -274,36 +335,4 @@ window.onload = function () {
         function(callback) { window.setTimeout(callback, 1000/60) };
 
         
-     //  // replace callback with function step (repaints the screen)
-
-      // var step = function ()
-
-
-      //   animate(step);
-      // }
-     //  // remove render's call from window.onload and move to step()
-
-      // window.onload = function() {
-
-      // }
-     //  //   maybe need to call requestAnimationFrame() or animate()
-     //  // window.onload call animate()
-
-     //  // Append property speed to Paddle
-     //  var xSpeed = 5;
-     //  var ySpeed = 5;
-      
-     // function Paddle(speed) {
-     //  this.speed = speed;
-     // }
-
-     //  // Append move() to Paddle
-
-      // var keysDown = {};
-
-
-     //  //   updates Y position based on speed and direction
-     //  //   make sure doesn't go off screen
-
-     //  // window.addEventListener() for key press
-     //  //   call .move() for appropriate paddle passing in a variable diection
+     
